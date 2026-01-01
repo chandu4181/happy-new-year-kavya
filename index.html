@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy New Year Kavya 🎉</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:white;
+
+      background:linear-gradient(45deg,
+        #ff9a9e,#fad0c4,
+        #fbc2eb,#a18cd1,
+        #84fab0,#8fd3f4,
+        #ffecd2,#fcb69f
+      );
+      background-size:500% 500%;
+      animation:rainbow 18s ease infinite;
+    }
+
+    @keyframes rainbow{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+
+    .card{
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:25px;
+      padding:25px;
+      max-width:480px;
+      width:92%;
+      text-align:center;
+      backdrop-filter:blur(10px);
+      z-index:2;
+      box-shadow:0 25px 50px rgba(0,0,0,.25);
+    }
+
+    .photo{
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      object-fit:cover;
+      border:4px solid #fff;
+      margin-bottom:12px;
+      box-shadow:0 0 25px rgba(255,255,255,.6);
+    }
+
+    h1{margin:8px 0 14px;font-size:26px;}
+    p{line-height:1.7;font-size:15px;color:#fff;margin:0;white-space:pre-line;}
+    .footer{margin-top:16px;font-size:14px;opacity:.95;}
+
+    canvas{
+      position:fixed;
+      top:0;left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="fireworks"></canvas>
+
+  <!-- MUSIC — autoplay, no controls -->
+  <audio id="bgmusic" src="music.mp3" autoplay playsinline></audio>
+
+  <div class="card">
+    <img src="image.jpeg" class="photo" alt="Photo" />
+
+    <h1>Happy New Year, Kavya 🎉</h1>
+
+    <!-- text will be typed here -->
+    <p id="message"></p>
+
+    <div class="footer">
+      — Chandu ❤️
+    </div>
+  </div>
+
+  <script>
+    // ------------ FIREWORKS ------------
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    let w, h;
+
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const particles = [];
+    function random(min,max){ return Math.random()*(max-min)+min; }
+
+    function createFirework(){
+      const x = random(0, w);
+      const y = random(h*0.1, h*0.5);
+      const count = 60;
+      for(let i=0;i<count;i++){
+        particles.push({
+          x, y,
+          angle:(Math.PI*2)*(i/count),
+          speed:random(1,4),
+          life:80,
+          alpha:1
+        });
+      }
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+
+      particles.forEach((p,i)=>{
+        const vx = Math.cos(p.angle)*p.speed;
+        const vy = Math.sin(p.angle)*p.speed + 0.03*p.life;
+
+        p.x += vx;
+        p.y += vy;
+        p.life--;
+        p.alpha -= 0.012;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,2,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+        ctx.fill();
+
+        if(p.life<=0 || p.alpha<=0){
+          particles.splice(i,1);
+        }
+      });
+
+      if(Math.random() < 0.05) createFirework();
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // ------------ AUTOPLAY FIX ------------
+    window.addEventListener("load", () => {
+      const audio = document.getElementById("bgmusic");
+      audio.loop = false;
+      audio.play().catch(() => {
+        // fallback if browser blocks autoplay
+        document.body.addEventListener("click", () => audio.play(), { once:true });
+      });
+    });
+
+    // ------------ TYPING EFFECT ------------
+    const text = `
+May this New Year bring you endless smiles, good health,
+beautiful surprises and everything your heart wishes for.
+
+You make our family happier and brighter just by being part of it.
+Thank you for your love, kindness and support always.
+
+May this year be filled with peace, success and
+moments that make you feel truly blessed. ✨
+`;
+
+    const messageEl = document.getElementById("message");
+    let index = 0;
+
+    function typeLetter(){
+      if(index < text.length){
+        messageEl.textContent += text.charAt(index);
+        index++;
+        setTimeout(typeLetter, 35); // typing speed (lower = faster)
+      }
+    }
+
+    typeLetter();
+  </script>
+
+</body>
+</html>
